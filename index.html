@@ -289,7 +289,7 @@ dialog::backdrop{background:rgba(10,15,20,.55)}
   <h2>Acesso da equipe</h2>
   <p>Para agentes de saúde e servidores com acesso liberado pela Prefeitura.</p>
   <div class="fields">
-    <label class="f">E-mail<input type="email" id="lEmail" autocomplete="username"></label>
+    <label class="f">E-mail<input type="email" id="lEmail" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email"></label>
     <label class="f">Senha<input type="password" id="lSenha" autocomplete="current-password"></label>
     <button class="btn btn-primary" id="btnLogin" type="button">Entrar</button>
     <button class="btn btn-ghost" id="btnLoginCancel" type="button">Cancelar</button>
@@ -528,7 +528,7 @@ renderHistorico();
 /* ================= SUPABASE ================= */
 const SB_URL = 'https://hhkaaayizcbrxwphcvje.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoa2FhYXlpemNicnh3cGhjdmplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDI3MzMsImV4cCI6MjEwNjQ3ODczM30.yJczbGmDRKCwH34gPJkaM7eSuqUPwfOEa23NQhie1aM';
-const VERSAO = '1.1.0';
+const VERSAO = '1.1.1';
 
 const store = {
   get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
@@ -559,7 +559,7 @@ async function tokenValido(){
   catch(e){ if(navigator.onLine){ sairAcs(); } return null; }
 }
 async function entrar(){
-  const email = $('lEmail').value.trim(), senha = $('lSenha').value;
+  const email = $('lEmail').value.trim().toLowerCase(), senha = $('lSenha').value;
   const err = $('loginErr'); err.hidden = true;
   if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.hidden = false; return; }
   $('btnLogin').textContent = 'Entrando…';
