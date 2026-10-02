@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F4E79">
+<meta name="description" content="Avaliação gratuita de risco da sua moradia: trincas, encostas, muros e alagamentos. Funciona sem internet.">
+<title>Minha Casa Segura</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E7EAE4; --surface:#F7F8F4; --ink:#17212C; --muted:#4E5964; --line:#C6CCC3;
+  --brand:#1F4E79; --brand-ink:#FFFFFF;
+  --l0:#2E7D4F; --l1:#E3A80F; --l2:#D9661A; --l3:#BF2329;
+  --l0-ink:#FFFFFF; --l1-ink:#1D1600; --l2-ink:#FFFFFF; --l3-ink:#FFFFFF;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161D; --surface:#19212B; --ink:#E8ECF0; --muted:#9BA7B3; --line:#2B3642;
+    --brand:#7FB2E5; --brand-ink:#0C1824;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161D; --surface:#19212B; --ink:#E8ECF0; --muted:#9BA7B3; --line:#2B3642;
+  --brand:#7FB2E5; --brand-ink:#0C1824;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,a{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px;border-radius:6px}
+.wrap{max-width:40rem;margin:0 auto;padding:1.25rem 1.25rem 3rem}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.25rem 0 1.25rem}
+.logo{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:1.25rem;letter-spacing:.01em;display:flex;align-items:center;gap:.5rem}
+.logo svg{flex:none}
+.linkbtn{background:none;border:0;padding:.5rem .25rem;color:var(--brand);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+h1,h2,h3{font-family:var(--display);font-stretch:75%;line-height:1.05;margin:0}
+h1{font-size:clamp(2.6rem,11vw,4rem);font-weight:900;letter-spacing:-.01em}
+h2{font-size:clamp(1.7rem,6.5vw,2.3rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:800}
+p{margin:.75rem 0}
+.lead{font-size:1.15rem;color:var(--muted);max-width:34rem}
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:3.6rem;padding:.9rem 1.25rem;border-radius:14px;border:2px solid transparent;font-weight:700;font-size:1.15rem;cursor:pointer;text-decoration:none;transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brand);color:var(--brand-ink)}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.stack{display:grid;gap:.75rem}
+
+/* régua de risco */
+.scale{margin:2rem 0 1.5rem;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.scale-bar{display:grid;grid-template-columns:repeat(4,1fr);height:14px}
+.scale-bar span:nth-child(1){background:var(--l0)}.scale-bar span:nth-child(2){background:var(--l1)}
+.scale-bar span:nth-child(3){background:var(--l2)}.scale-bar span:nth-child(4){background:var(--l3)}
+.scale-rows{display:grid;grid-template-columns:repeat(4,1fr)}
+.scale-rows div{padding:.75rem .6rem;font-size:.9rem;border-left:1px solid var(--line)}
+.scale-rows div:first-child{border-left:0}
+.scale-rows b{display:block;font-family:var(--display);font-stretch:75%;font-size:1.05rem}
+@media (max-width:30rem){
+  .scale-rows{grid-template-columns:1fr 1fr}
+  .scale-rows div:nth-child(3){border-left:0}
+  .scale-rows div:nth-child(n+3){border-top:1px solid var(--line)}
+}
+.emergency{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.1rem;border-radius:14px;background:var(--surface);border:2px solid var(--l3);margin:1.5rem 0}
+.emergency p{margin:0;font-weight:700}
+.emergency a{flex:none;background:var(--l3);color:#fff;text-decoration:none;font-weight:700;padding:.65rem 1rem;border-radius:10px}
+.history{margin-top:2rem}
+.history ul{list-style:none;padding:0;margin:.75rem 0 0;display:grid;gap:.5rem}
+.history li{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;background:var(--surface);border-radius:12px;border:1px solid var(--line)}
+.dot{width:14px;height:14px;border-radius:50%;flex:none}
+
+/* questionário */
+.ruler{position:relative;height:28px;margin:.25rem 0 1.75rem;border-bottom:2px solid var(--ink)}
+.ruler::before{content:"";position:absolute;inset:auto 0 0 0;height:10px;background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 10%)}
+.ruler-fill{position:absolute;left:0;bottom:0;height:10px;background:var(--brand);opacity:.85;transition:width .25s ease}
+.ruler-label{position:absolute;top:0;left:0;font-size:.9rem;color:var(--muted)}
+.ruler-count{position:absolute;top:0;right:0;font-size:.9rem;color:var(--muted)}
+.block{font-weight:700;color:var(--brand);margin-bottom:.5rem}
+.block.crit{color:var(--l3)}
+.qtext{font-family:var(--display);font-stretch:85%;font-weight:800;font-size:clamp(1.55rem,6vw,2.05rem);line-height:1.15;margin:0 0 .75rem}
+.help{color:var(--muted);margin:0 0 1.5rem}
+.answers{display:grid;gap:.75rem}
+.answers.yn{grid-template-columns:1fr 1fr}
+.answers.yn .ns{grid-column:1/-1}
+.ans{min-height:4rem;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:1.25rem;cursor:pointer;padding:.75rem 1rem;text-align:center;display:flex;align-items:center;justify-content:center;gap:.75rem}
+.ans.sel{border-color:var(--brand);box-shadow:inset 0 0 0 2px var(--brand)}
+.ans.ns{font-size:1rem;min-height:3.2rem;color:var(--muted)}
+.ans.choice{justify-content:flex-start;text-align:left;font-size:1.1rem}
+.ans.choice svg{flex:none}
+.qnav{display:flex;justify-content:space-between;margin-top:1.5rem}
+
+/* resultado */
+#result{min-height:100%}
+.res-head{padding:1.5rem 1.25rem 2rem;margin:-1.25rem -1.25rem 1.5rem;background:var(--lvl);color:var(--lvl-ink)}
+.res-head .tag{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:1.1rem;opacity:.9}
+.res-head h1{margin:.4rem 0 .6rem}
+.res-head p{margin:0;font-size:1.15rem;max-width:32rem}
+.actions{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem;counter-reset:a}
+.actions li{counter-increment:a;display:grid;grid-template-columns:2rem 1fr;gap:.5rem;align-items:start;padding:.85rem 1rem;background:var(--surface);border-radius:12px;border-left:6px solid var(--lvl)}
+.actions li::before{content:counter(a);font-family:var(--display);font-weight:900;font-size:1.3rem;line-height:1.3}
+.found{margin-top:1.75rem}
+.found ul{padding-left:1.2rem;margin:.5rem 0 0}
+.found li{margin:.3rem 0}
+.callrow{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.5rem 0}
+.callrow a{background:var(--l3);color:#fff}
+.note{font-size:.92rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1rem;margin-top:2rem}
+.health{margin-top:1.5rem;padding:1rem 1.1rem;border-radius:12px;background:var(--surface);border:1px dashed var(--brand)}
+/* envio e modo ACS */
+.send{margin-top:2rem;padding:1.25rem;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.send h3{margin-bottom:.5rem}
+.send p{color:var(--muted);margin:.25rem 0 1rem}
+.consent{display:grid;grid-template-columns:1.6rem 1fr;gap:.6rem;align-items:start;padding:.85rem;border-radius:12px;border:2px solid var(--line);cursor:pointer;margin-bottom:1rem}
+.consent input{width:1.4rem;height:1.4rem;margin:.15rem 0 0;accent-color:var(--brand)}
+.consent:has(input:checked){border-color:var(--brand)}
+.fields{display:grid;gap:.85rem}
+.fields[aria-disabled="true"]{opacity:.45;pointer-events:none}
+label.f{display:grid;gap:.3rem;font-weight:700;font-size:.95rem}
+label.f small{font-weight:400;color:var(--muted)}
+.f input[type=text],.f input[type=email],.f input[type=password]{font:inherit;padding:.8rem .9rem;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);min-height:3.1rem;width:100%}
+.f input:focus{border-color:var(--brand);outline:none}
+.geo{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.geo .btn{width:auto;min-height:3rem;font-size:1rem}
+.geo span{color:var(--muted);font-size:.95rem}
+.photo-prev{max-width:100%;max-height:220px;border-radius:10px;display:block;margin-top:.5rem}
+.status{margin-top:1rem;padding:.85rem 1rem;border-radius:12px;font-weight:700}
+.status.ok{background:color-mix(in srgb,var(--l0) 16%,transparent);border:2px solid var(--l0)}
+.status.wait{background:color-mix(in srgb,var(--l1) 18%,transparent);border:2px solid var(--l1)}
+.status.err{background:color-mix(in srgb,var(--l3) 14%,transparent);border:2px solid var(--l3)}
+.acsbar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;padding:.85rem 1rem;border-radius:14px;background:var(--brand);color:var(--brand-ink);margin-bottom:1.5rem}
+.acsbar b{font-family:var(--display);font-stretch:80%;font-size:1.15rem}
+.acsbar button{background:none;border:2px solid currentColor;color:inherit;border-radius:10px;padding:.45rem .8rem;font-weight:700;cursor:pointer}
+.queue{margin-top:1rem;color:var(--muted);font-size:.95rem}
+.list{list-style:none;padding:0;margin:1rem 0;display:grid;gap:.5rem}
+.list li{display:grid;grid-template-columns:14px 1fr auto;gap:.75rem;align-items:center;padding:.75rem .9rem;background:var(--surface);border-radius:12px;border:1px solid var(--line)}
+.list small{color:var(--muted)}
+.empty{color:var(--muted);padding:1rem 0}
+[hidden]{display:none!important}
+dialog{border:0;border-radius:18px;max-width:34rem;width:calc(100% - 2rem);background:var(--surface);color:var(--ink);padding:1.5rem}
+dialog::backdrop{background:rgba(10,15,20,.55)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 13 14 4l11 9v11H3z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M9 24v-7h10v7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M3 27h22" stroke="var(--l0)" stroke-width="3"/></svg>
+      Minha Casa Segura
+    </div>
+    <button class="linkbtn" id="btnSobre">Sobre</button>
+  </header>
+
+  <!-- INÍCIO -->
+  <main id="home">
+    <div class="acsbar" id="acsBar" hidden>
+      <div><b id="acsNome"></b><br><span id="acsInfo"></span></div>
+      <div style="display:flex;gap:.5rem">
+        <button id="btnMinhas">Minhas avaliações</button>
+        <button id="btnSairAcs">Sair</button>
+      </div>
+    </div>
+    <h1>Sua casa está segura?</h1>
+    <p class="lead">Responda perguntas simples sobre paredes, terreno e chuva. Em uns 3 minutos você sabe o nível de risco e o que fazer. Funciona sem internet.</p>
+
+    <div class="scale" role="img" aria-label="Escala de risco em quatro níveis: verde, amarelo, laranja e vermelho">
+      <div class="scale-bar"><span></span><span></span><span></span><span></span></div>
+      <div class="scale-rows">
+        <div><b>Verde</b>Sem sinais importantes</div>
+        <div><b>Amarelo</b>Fique de olho</div>
+        <div><b>Laranja</b>Peça vistoria</div>
+        <div><b>Vermelho</b>Perigo imediato</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <button class="btn btn-primary" id="btnStart">Começar avaliação</button>
+    </div>
+
+    <div class="emergency">
+      <p>Terra se movendo, estalos ou água subindo agora?</p>
+      <a href="tel:199">Ligar 199</a>
+    </div>
+
+    <p class="queue" id="queueInfo" hidden></p>
+
+    <section class="history" id="history" hidden>
+      <h3>Suas avaliações</h3>
+      <ul id="historyList"></ul>
+    </section>
+
+    <p style="margin-top:2.5rem"><button class="linkbtn" id="btnAcs">Sou agente de saúde ou da prefeitura</button></p>
+  </main>
+
+  <!-- MINHAS AVALIAÇÕES (ACS) -->
+  <main id="minhas" hidden>
+    <h2>Minhas avaliações</h2>
+    <ul class="list" id="minhasList"></ul>
+    <button class="btn btn-ghost" id="btnMinhasVoltar">Voltar ao início</button>
+  </main>
+
+  <!-- QUESTIONÁRIO -->
+  <main id="quiz" hidden>
+    <div class="ruler" aria-hidden="true">
+      <span class="ruler-label" id="rLabel"></span>
+      <span class="ruler-count" id="rCount"></span>
+      <div class="ruler-fill" id="rFill"></div>
+    </div>
+    <div class="block" id="qBlock"></div>
+    <h2 class="qtext" id="qText" tabindex="-1"></h2>
+    <p class="help" id="qHelp"></p>
+    <div id="qAnswers"></div>
+    <div class="qnav">
+      <button class="linkbtn" id="btnBack">Voltar</button>
+      <button class="linkbtn" id="btnQuit">Sair</button>
+    </div>
+  </main>
+
+  <!-- RESULTADO -->
+  <main id="result" hidden>
+    <div class="res-head">
+      <div class="tag" id="resTag"></div>
+      <h1 id="resTitle" tabindex="-1"></h1>
+      <p id="resSub"></p>
+    </div>
+    <h3>O que fazer</h3>
+    <ol class="actions" id="resActions"></ol>
+    <div class="callrow">
+      <a class="btn" href="tel:199">Defesa Civil 199</a>
+      <a class="btn" href="tel:193">Bombeiros 193</a>
+    </div>
+    <div class="health" id="resHealth" hidden></div>
+    <section class="found" id="resFound"></section>
+
+    <section class="send" id="send">
+      <h3 id="sendTitle">Ajude a mapear as áreas de risco</h3>
+      <p id="sendSub">Se quiser, envie esta avaliação para a Defesa Civil e a Prefeitura de Santana de Parnaíba. Nome e documentos não são pedidos.</p>
+      <label class="consent">
+        <input type="checkbox" id="consent">
+        <span>Autorizo enviar estas respostas, e a localização e a foto se eu adicionar, para uso no mapeamento de áreas de risco do município.</span>
+      </label>
+      <div class="fields" id="fields" aria-disabled="true">
+        <div class="geo">
+          <button class="btn btn-ghost" id="btnGeo" type="button">Usar minha localização</button>
+          <span id="geoInfo">Opcional, ajuda a localizar a casa no mapa.</span>
+        </div>
+        <label class="f">Bairro
+          <input type="text" id="fBairro" maxlength="120" autocomplete="address-level3">
+        </label>
+        <label class="f">Ponto de referência <small>Opcional. Ex.: perto da escola, fim da rua de terra.</small>
+          <input type="text" id="fRef" maxlength="200">
+        </label>
+        <label class="f" id="fMicroWrap" hidden>Microárea
+          <input type="text" id="fMicro" maxlength="20">
+        </label>
+        <label class="f">Foto da trinca ou do problema <small>Opcional.</small>
+          <input type="file" id="fFoto" accept="image/*" capture="environment">
+          <img class="photo-prev" id="fotoPrev" alt="Prévia da foto escolhida" hidden>
+        </label>
+        <button class="btn btn-primary" id="btnEnviar" type="button">Enviar avaliação</button>
+      </div>
+      <div class="status" id="sendStatus" role="status" hidden></div>
+    </section>
+    <div class="stack" style="margin-top:1.75rem">
+      <button class="btn btn-primary" id="btnShare">Compartilhar resultado</button>
+      <button class="btn btn-ghost" id="btnAgain">Fazer nova avaliação</button>
+      <button class="btn btn-ghost" id="btnHome">Voltar ao início</button>
+    </div>
+    <p class="note">Esta avaliação é uma orientação preventiva e não substitui vistoria ou laudo técnico. Na dúvida, chame a Defesa Civil ou um engenheiro.</p>
+  </main>
+</div>
+
+<dialog id="dlgSobre">
+  <h2>Sobre</h2>
+  <p>O Minha Casa Segura ajuda moradores a perceber sinais de risco na moradia antes que virem acidente: trincas, muros, encostas e alagamentos.</p>
+  <p>Os critérios foram definidos por um engenheiro civil que também atua como Agente Comunitário de Saúde, com base em sinais usados em vistorias de patologia construtiva e em orientações de Defesa Civil.</p>
+  <p>O resultado é uma orientação preventiva, não um laudo. Suas respostas ficam salvas só neste aparelho. Elas só são enviadas para a Prefeitura se você autorizar no final da avaliação, sem nome nem documentos.</p>
+  <p><b>Desenvolvido por Wilson Foster</b><br>Engenheiro Civil · Foster Engenharia &amp; Construção<br><a href="mailto:comercial@fosterconstrucoes.com.br">comercial@fosterconstrucoes.com.br</a></p>
+  <form method="dialog"><button class="btn btn-primary">Fechar</button></form>
+</dialog>
+
+<dialog id="dlgLogin">
+  <h2>Acesso da equipe</h2>
+  <p>Para agentes de saúde e servidores com acesso liberado pela Prefeitura.</p>
+  <div class="fields">
+    <label class="f">E-mail<input type="email" id="lEmail" autocomplete="username"></label>
+    <label class="f">Senha<input type="password" id="lSenha" autocomplete="current-password"></label>
+    <button class="btn btn-primary" id="btnLogin" type="button">Entrar</button>
+    <button class="btn btn-ghost" id="btnLoginCancel" type="button">Cancelar</button>
+  </div>
+  <div class="status err" id="loginErr" role="alert" hidden></div>
+</dialog>
+
+<script>
+const ENC = r => r.encosta === 'sim';
+const TRI = r => r.tem_trinca === 'sim';
+
+const Q = [
+  {id:'encosta', bloco:'Onde fica sua casa', texto:'Sua casa fica em morro, encosta ou terreno inclinado?', ajuda:'Vale para casas no pé, no meio ou no topo do morro.', peso:0},
+  {id:'corrego', bloco:'Onde fica sua casa', texto:'A casa fica perto de córrego ou rio, ou já alagou alguma vez?', ajuda:'Considere perto: menos de 30 metros, mais ou menos meio quarteirão.', peso:3, rotulo:'Perto de córrego ou já alagou'},
+  {id:'chuva', bloco:'Onde fica sua casa', texto:'Choveu forte na sua região nos últimos 3 dias?', ajuda:'Solo encharcado aumenta o risco de deslizamento e de muro cair.', peso:0},
+
+  {id:'c_trinca_cresce', critico:true, bloco:'Sinais de perigo imediato', texto:'Alguma trinca apareceu ou aumentou nos últimos dias? Ou você ouviu estalos vindo das paredes ou do teto?', ajuda:'Trinca que cresce rápido indica que a estrutura está se movendo agora.', rotulo:'Trinca crescendo ou estalos na estrutura'},
+  {id:'c_terreno', critico:true, bloco:'Sinais de perigo imediato', texto:'Apareceram rachaduras ou "degraus" no terreno, no quintal ou na rua?', ajuda:'Olhe o chão de terra, o cimentado do quintal e a calçada.', rotulo:'Rachaduras ou degraus no terreno'},
+  {id:'c_inclina', critico:true, bloco:'Sinais de perigo imediato', texto:'Árvores, postes ou muros perto da casa começaram a inclinar?', ajuda:'Compare com fotos antigas ou pergunte aos vizinhos se já era assim.', rotulo:'Árvores, postes ou muros inclinando'},
+  {id:'c_agua', critico:true, bloco:'Sinais de perigo imediato', texto:'Está brotando água barrenta do chão ou do barranco durante ou depois da chuva?', ajuda:'Água turva saindo da terra mostra que o solo está sendo levado.', rotulo:'Água barrenta brotando do solo'},
+  {id:'c_cede', critico:true, bloco:'Sinais de perigo imediato', texto:'O piso está afundando, uma parede descolou ou alguma parte da casa cedeu?', ajuda:'Inclui degrau novo no piso e parede se afastando do teto.', rotulo:'Parte da casa cedendo ou afundando'},
+  {id:'c_enchente', critico:true, bloco:'Sinais de perigo imediato', texto:'A água do córrego ou da enchente está chegando na casa agora?', ajuda:'Se a água está subindo, não espere: saia e ligue 199.', rotulo:'Água de enchente chegando na casa'},
+
+  {id:'tem_trinca', bloco:'Paredes e estrutura', texto:'Existe alguma trinca ou rachadura nas paredes, no piso ou no teto?', ajuda:'Olhe por dentro e por fora, principalmente perto de portas e janelas.', peso:0},
+  {id:'diagonal', se:TRI, bloco:'Paredes e estrutura', texto:'Alguma trinca sai do canto de porta ou janela em diagonal, como uma escada?', ajuda:'Trinca inclinada, em 45 graus, costuma indicar que a fundação está cedendo.', peso:3, rotulo:'Trinca em diagonal em portas ou janelas'},
+  {id:'abertura', se:TRI, tipo:'escolha', bloco:'Paredes e estrutura', texto:'Qual a largura da maior trinca?', ajuda:'Tente encaixar um cartão ou uma moeda na abertura.', opcoes:[
+     {v:'0', t:'Fina como um fio de cabelo', ic:'hair'},
+     {v:'2', t:'Entra a ponta de um cartão', ic:'card', rotulo:'Trinca média (cabe um cartão)'},
+     {v:'4', t:'Entra uma moeda ou mais', ic:'coin', rotulo:'Trinca larga (cabe uma moeda)'}]},
+  {id:'porta', bloco:'Paredes e estrutura', texto:'Alguma porta ou janela começou a emperrar ou ficar torta?', ajuda:'Conta só se ela abria bem antes e mudou sem motivo.', peso:2, rotulo:'Porta ou janela começou a emperrar'},
+  {id:'ferragem', bloco:'Paredes e estrutura', texto:'Dá para ver ferro aparente ou enferrujado em coluna, viga ou laje?', ajuda:'Costuma aparecer com o concreto estufado ou caindo em pedaços.', peso:3, rotulo:'Ferragem aparente ou enferrujada'},
+  {id:'laje', bloco:'Paredes e estrutura', texto:'A laje tem "barriga" visível ou goteiras que não param?', ajuda:'Olhe o teto de lado, contra a luz: a laje deve ser reta.', peso:2, rotulo:'Laje com barriga ou goteiras'},
+  {id:'andares', bloco:'Paredes e estrutura', texto:'A casa tem 2 andares ou mais e foi construída sem engenheiro?', ajuda:'Inclui puxadinhos e andares de cima feitos depois.', peso:2, rotulo:'Dois ou mais andares sem engenheiro'},
+  {id:'eletrica', bloco:'Paredes e estrutura', texto:'Tem fiação exposta, emendas com fita ou "gambiarra" elétrica?', ajuda:'Fio solto perto de água ou trinca aumenta o risco de choque e incêndio.', peso:1, rotulo:'Fiação exposta ou gambiarra'},
+
+  {id:'corte', se:ENC, bloco:'Terreno e entorno', texto:'Tem um barranco cortado reto, quase em pé, logo atrás ou na frente da casa?', ajuda:'Corte vertical sem contenção é a situação mais comum em deslizamentos.', peso:3, rotulo:'Barranco cortado reto perto da casa'},
+  {id:'muro', bloco:'Terreno e entorno', texto:'Se existe muro segurando terra: ele está inclinado, estufado ou sem furinhos para a água sair?', ajuda:'Se não existe muro de contenção, responda Não.', peso:3, rotulo:'Muro de contenção com problema'},
+  {id:'esgoto', se:ENC, bloco:'Terreno e entorno', texto:'Esgoto ou água de chuva da casa é jogado direto no barranco?', ajuda:'Água concentrada no barranco encharca o solo e provoca deslizamento.', peso:3, rotulo:'Esgoto ou água de chuva no barranco'},
+  {id:'lixo', se:ENC, bloco:'Terreno e entorno', texto:'Tem lixo ou entulho acumulado no morro perto da casa?', ajuda:'Lixo retém água e desliza junto com a terra.', peso:2, rotulo:'Lixo ou entulho no morro'},
+  {id:'bananeira', se:ENC, bloco:'Terreno e entorno', texto:'Tem bananeiras plantadas no barranco?', ajuda:'Bananeira acumula água e tem raiz curta: não segura a terra.', peso:1, rotulo:'Bananeiras no barranco'},
+  {id:'vazamento', bloco:'Terreno e entorno', texto:'Tem vazamento constante de cano ou caixa d\'água perto da base da casa?', ajuda:'Água vazando sem parar enfraquece o solo embaixo da fundação.', peso:2, rotulo:'Vazamento perto da fundação'},
+
+  {id:'mofo', bloco:'Umidade e saúde', texto:'Tem mofo ou bolor nas paredes ou no teto?', ajuda:'Manchas pretas ou esverdeadas, com cheiro de guardado.', peso:1, rotulo:'Mofo nas paredes', saude:true},
+  {id:'ventila', bloco:'Umidade e saúde', texto:'Algum quarto onde alguém dorme não tem janela ou fica sempre fechado?', ajuda:'Ventilação diária ajuda a evitar mofo e doenças respiratórias.', peso:1, rotulo:'Quarto sem ventilação', saude:true}
+];
+
+const NIVEIS = [
+  {nome:'Verde', titulo:'Sem sinais importantes agora', sub:'Pelas suas respostas, a casa não mostra sinais de risco relevantes neste momento.', acoes:[
+    'Refaça a avaliação na época de chuvas ou sempre que notar alguma mudança.',
+    'Mantenha calhas, ralos e canaletas limpos para a água da chuva escoar.',
+    'Não jogue lixo, entulho ou água de esgoto em barrancos ou córregos.',
+    'Fissuras finas como fio de cabelo são comuns: acompanhe para ver se crescem.']},
+  {nome:'Amarelo', titulo:'Fique de olho', sub:'Há sinais que merecem atenção. Acompanhar a evolução é o mais importante agora.', acoes:[
+    'Marque com caneta as duas pontas de cada trinca e escreva a data ao lado. Se ela passar da marca, está aumentando: faça a avaliação de novo.',
+    'Tire fotos das trincas com uma régua ou moeda ao lado para comparar depois.',
+    'Procure orientação de um engenheiro ou da Defesa Civil para avaliar os pontos encontrados.',
+    'Em dias de chuva forte, observe a casa e o terreno com mais atenção.']},
+  {nome:'Laranja', titulo:'Peça uma vistoria', sub:'Os sinais encontrados indicam risco relevante. Um técnico precisa ver a casa.', acoes:[
+    'Ligue 199 e peça uma vistoria da Defesa Civil, contando o que você encontrou.',
+    'Combine com a família um lugar seguro para ir em caso de chuva forte.',
+    'Não faça obras por conta própria em colunas, vigas, lajes ou muros de contenção.',
+    'Marque as trincas com caneta e data, e fique atento a estalos e portas emperrando.']},
+  {nome:'Vermelho', titulo:'Perigo imediato', sub:'Há sinal de que a casa ou o terreno podem estar se movendo agora.', acoes:[
+    'Se perceber estalos, trincas crescendo, terra se movendo ou água subindo, saia de casa com todos agora.',
+    'Leve documentos, remédios e o celular. Avise os vizinhos.',
+    'Ligue 199 (Defesa Civil) ou 193 (Bombeiros) assim que estiver em local seguro.',
+    'Não volte para casa até um técnico liberar.']}
+];
+
+let resp = {}, trilha = [], atual = 0, ultimoResultado = null;
+const $ = id => document.getElementById(id);
+
+function visivel(q){ return !q.se || q.se(resp); }
+function proxima(from){ for(let i=from;i<Q.length;i++){ if(visivel(Q[i])) return i; } return -1; }
+function totalVisiveis(){ return Q.filter(visivel).length; }
+
+function mostrar(tela){
+  ['home','quiz','result','minhas'].forEach(t => $(t).hidden = t !== tela);
+  window.scrollTo(0,0);
+}
+
+function iniciar(){
+  resp = {}; trilha = []; atual = proxima(0);
+  mostrar('quiz'); renderPergunta();
+}
+
+const ICONES = {
+  hair:'<svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true"><path d="M4 22 C14 6, 26 22, 40 6" fill="none" stroke="currentColor" stroke-width="1"/></svg>',
+  card:'<svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true"><rect x="6" y="5" width="32" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11h32" stroke="currentColor" stroke-width="2"/></svg>',
+  coin:'<svg width="44" height="28" viewBox="0 0 44 28" aria-hidden="true"><circle cx="22" cy="14" r="11" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="22" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>'
+};
+
+function renderPergunta(){
+  const q = Q[atual];
+  const feitas = trilha.length, total = totalVisiveis();
+  $('rFill').style.width = Math.round(feitas/total*100) + '%';
+  $('rLabel').textContent = q.bloco;
+  $('rCount').textContent = (feitas+1) + ' de ' + total;
+  $('qBlock').textContent = q.critico ? 'Sinal de perigo imediato' : q.bloco;
+  $('qBlock').className = 'block' + (q.critico ? ' crit' : '');
+  $('qText').textContent = q.texto;
+  $('qHelp').textContent = q.ajuda || '';
+  const box = $('qAnswers'); box.innerHTML = '';
+  if(q.tipo === 'escolha'){
+    box.className = 'answers';
+    q.opcoes.forEach(o => box.appendChild(botao(ICONES[o.ic] + '<span>' + o.t + '</span>', 'ans choice', o.v)));
+  } else {
+    box.className = 'answers yn';
+    box.appendChild(botao('Sim','ans','sim'));
+    box.appendChild(botao('Não','ans','nao'));
+    box.appendChild(botao('Não sei','ans ns','naosei'));
+  }
+  $('btnBack').style.visibility = trilha.length ? 'visible' : 'hidden';
+  $('qText').focus({preventScroll:true});
+}
+
+function botao(html, cls, valor){
+  const b = document.createElement('button');
+  b.className = cls + (resp[Q[atual].id] === valor ? ' sel' : '');
+  b.innerHTML = html;
+  b.onclick = () => responder(valor);
+  return b;
+}
+
+function responder(v){
+  const q = Q[atual];
+  resp[q.id] = v;
+  trilha.push(atual);
+  if(q.critico && v === 'sim'){ finalizar(); return; }
+  const n = proxima(atual+1);
+  if(n === -1){ finalizar(); return; }
+  atual = n; renderPergunta();
+}
+
+function voltar(){
+  if(!trilha.length) return;
+  atual = trilha.pop();
+  delete resp[Q[atual].id];
+  renderPergunta();
+}
+
+function avaliar(r){
+  const respondidas = Q.filter(q => visivel(q) && r[q.id] !== undefined);
+  const criticos = respondidas.filter(q => q.critico && r[q.id] === 'sim');
+  const naoSei = respondidas.filter(q => r[q.id] === 'naosei').map(q => q.rotulo || q.texto);
+  const sinais = [];
+  let pts = 0;
+  respondidas.forEach(q => {
+    if(q.tipo === 'escolha'){
+      const o = q.opcoes.find(o => o.v === r[q.id]);
+      const p = Number(r[q.id] || 0); pts += p;
+      if(p > 0) sinais.push(o.rotulo);
+    } else if(r[q.id] === 'sim' && q.peso){
+      pts += q.peso; sinais.push(q.rotulo);
+    }
+  });
+  if(criticos.length){
+    return {nivel:3, pts, sinais:criticos.map(q => q.rotulo).concat(sinais), naoSei, agravantes:[]};
+  }
+  let nivel = pts >= 9 ? 2 : pts >= 4 ? 1 : 0;
+  const agravantes = [];
+  if(r.diagonal === 'sim' && r.porta === 'sim'){ nivel++; agravantes.push('Trinca diagonal junto com porta emperrando costuma indicar fundação cedendo.'); }
+  if(r.chuva === 'sim' && (r.encosta === 'sim' || r.corrego === 'sim')){ nivel++; agravantes.push('Chuva forte recente em encosta ou perto de córrego aumenta o risco.'); }
+  return {nivel:Math.min(nivel,3), pts, sinais, naoSei, agravantes};
+}
+
+function finalizar(){
+  const a = avaliar(resp);
+  ultimoResultado = a;
+  const N = NIVEIS[a.nivel];
+  const root = $('result');
+  root.style.setProperty('--lvl', 'var(--l' + a.nivel + ')');
+  root.style.setProperty('--lvl-ink', 'var(--l' + a.nivel + '-ink)');
+  $('resTag').textContent = 'Nível ' + N.nome.toLowerCase();
+  $('resTitle').textContent = N.titulo;
+  $('resSub').textContent = N.sub;
+  $('resActions').innerHTML = N.acoes.map(t => '<li>' + t + '</li>').join('');
+
+  const saude = Q.some(q => q.saude && resp[q.id] === 'sim');
+  $('resHealth').hidden = !saude;
+  if(saude){
+    $('resHealth').innerHTML = '<b>Cuidado com a saúde da família.</b> Mofo e falta de ventilação aumentam crises de asma, rinite e alergias. Abra janelas todos os dias e procure sua UBS se alguém da casa tem tosse ou falta de ar com frequência.';
+  }
+
+  let html = '';
+  if(a.sinais.length) html += '<h3>Sinais encontrados</h3><ul>' + a.sinais.map(s => '<li>' + s + '</li>').join('') + '</ul>';
+  if(a.agravantes.length) html += '<h3 style="margin-top:1.25rem">Por que o nível subiu</h3><ul>' + a.agravantes.map(s => '<li>' + s + '</li>').join('') + '</ul>';
+  if(a.naoSei.length) html += '<h3 style="margin-top:1.25rem">Para conferir com um técnico</h3><ul>' + a.naoSei.map(s => '<li>' + s + '</li>').join('') + '</ul>';
+  $('resFound').innerHTML = html;
+
+  salvarHistorico(a.nivel);
+  prepararEnvio(a);
+  mostrar('result');
+  $('resTitle').focus({preventScroll:true});
+}
+
+function salvarHistorico(nivel){
+  try{
+    const h = JSON.parse(localStorage.getItem('mcs_historico') || '[]');
+    h.unshift({d:new Date().toISOString(), n:nivel});
+    localStorage.setItem('mcs_historico', JSON.stringify(h.slice(0,8)));
+  }catch(e){}
+}
+
+function renderHistorico(){
+  let h = [];
+  try{ h = JSON.parse(localStorage.getItem('mcs_historico') || '[]'); }catch(e){}
+  $('history').hidden = !h.length;
+  $('historyList').innerHTML = h.map(i => {
+    const d = new Date(i.d).toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+    return '<li><span class="dot" style="background:var(--l' + i.n + ')"></span><span><b>' + NIVEIS[i.n].nome + '</b> — ' + d + '</span></li>';
+  }).join('');
+}
+
+async function compartilhar(){
+  if(!ultimoResultado) return;
+  const N = NIVEIS[ultimoResultado.nivel];
+  const texto = 'Fiz a avaliação Minha Casa Segura e minha casa ficou no nível ' + N.nome.toUpperCase() + ': ' + N.titulo + '. Faça a sua também, é grátis e funciona sem internet.';
+  try{
+    if(navigator.share){ await navigator.share({title:'Minha Casa Segura', text:texto, url:location.href}); return; }
+    await navigator.clipboard.writeText(texto + ' ' + location.href);
+    $('btnShare').textContent = 'Texto copiado';
+    setTimeout(() => $('btnShare').textContent = 'Compartilhar resultado', 2500);
+  }catch(e){}
+}
+
+$('btnStart').onclick = iniciar;
+$('btnAgain').onclick = iniciar;
+$('btnBack').onclick = voltar;
+$('btnQuit').onclick = () => { renderHistorico(); mostrar('home'); };
+$('btnHome').onclick = () => { renderHistorico(); mostrar('home'); };
+$('btnShare').onclick = compartilhar;
+$('btnSobre').onclick = () => $('dlgSobre').showModal();
+renderHistorico();
+
+/* ================= SUPABASE ================= */
+const SB_URL = 'https://hhkaaayizcbrxwphcvje.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoa2FhYXlpemNicnh3cGhjdmplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MDI3MzMsImV4cCI6MjEwNjQ3ODczM30.yJczbGmDRKCwH34gPJkaM7eSuqUPwfOEa23NQhie1aM';
+const VERSAO = '1.1.0';
+
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+
+/* ---------- sessão ACS ---------- */
+let sessao = store.get('mcs_sessao', null);   // {access_token, refresh_token, expires_at, user_id}
+let perfil = store.get('mcs_perfil', null);   // {nome, papel, microarea}
+
+async function authFetch(path, body){
+  const r = await fetch(SB_URL + path, {method:'POST', headers:{apikey:SB_KEY, 'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw j;
+  return j;
+}
+function guardarSessao(j){
+  sessao = {access_token:j.access_token, refresh_token:j.refresh_token, expires_at:Math.floor(Date.now()/1000) + (j.expires_in||3600), user_id:j.user.id};
+  store.set('mcs_sessao', sessao);
+}
+async function tokenValido(){
+  if(!sessao) return null;
+  if(sessao.expires_at - 60 > Date.now()/1000) return sessao.access_token;
+  try{ guardarSessao(await authFetch('/auth/v1/token?grant_type=refresh_token', {refresh_token:sessao.refresh_token})); return sessao.access_token; }
+  catch(e){ if(navigator.onLine){ sairAcs(); } return null; }
+}
+async function entrar(){
+  const email = $('lEmail').value.trim(), senha = $('lSenha').value;
+  const err = $('loginErr'); err.hidden = true;
+  if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; err.hidden = false; return; }
+  $('btnLogin').textContent = 'Entrando…';
+  try{
+    guardarSessao(await authFetch('/auth/v1/token?grant_type=password', {email, password:senha}));
+    const r = await fetch(SB_URL + '/rest/v1/profiles?select=nome,papel,microarea&id=eq.' + sessao.user_id,
+      {headers:{apikey:SB_KEY, Authorization:'Bearer ' + sessao.access_token}});
+    const p = (await r.json())[0];
+    if(!p){ sairAcs(); throw {msg:'Seu usuário ainda não foi liberado. Fale com o administrador.'}; }
+    perfil = p; store.set('mcs_perfil', p);
+    $('dlgLogin').close(); $('lSenha').value = '';
+    renderAcs(); processarFila();
+  }catch(e){
+    err.textContent = e.msg || (navigator.onLine ? 'E-mail ou senha incorretos.' : 'Sem internet. O primeiro acesso precisa de conexão.');
+    err.hidden = false;
+  }finally{ $('btnLogin').textContent = 'Entrar'; }
+}
+function sairAcs(){ sessao = null; perfil = null; store.del('mcs_sessao'); store.del('mcs_perfil'); renderAcs(); }
+function renderAcs(){
+  const on = !!(sessao && perfil);
+  $('acsBar').hidden = !on; $('btnAcs').hidden = on;
+  if(on){
+    $('acsNome').textContent = perfil.nome;
+    $('acsInfo').textContent = (perfil.papel === 'gestor' ? 'Gestor' : 'Agente de saúde') + (perfil.microarea ? ' · microárea ' + perfil.microarea : '');
+  }
+}
+
+/* ---------- fila offline ---------- */
+function fila(){ return store.get('mcs_fila', []); }
+function renderFila(){
+  const n = fila().length;
+  $('queueInfo').hidden = !n;
+  $('queueInfo').textContent = n === 1 ? '1 avaliação aguardando internet para ser enviada.' : n + ' avaliações aguardando internet para serem enviadas.';
+}
+async function enviarItem(item){
+  let auth = SB_KEY;
+  if(item.payload.origem === 'acs'){
+    auth = await tokenValido();
+    if(!auth) throw new Error('sem-sessao');
+  }
+  const h = {apikey:SB_KEY, Authorization:'Bearer ' + auth};
+  if(item.foto && !item.fotoEnviada){
+    const blob = await (await fetch(item.foto)).blob();
+    const r = await fetch(SB_URL + '/storage/v1/object/fotos/' + item.payload.foto_path, {method:'POST', headers:{...h, 'Content-Type':'image/jpeg', 'x-upsert':'false'}, body:blob});
+    if(!r.ok && r.status !== 409 && r.status !== 400) throw new Error('foto ' + r.status);
+    item.fotoEnviada = true;
+  }
+  const r = await fetch(SB_URL + '/rest/v1/avaliacoes', {method:'POST', headers:{...h, 'Content-Type':'application/json', Prefer:'return=minimal'}, body:JSON.stringify(item.payload)});
+  if(r.status === 409) return true;          // já enviada antes (client_id repetido)
+  if(!r.ok) throw new Error('insert ' + r.status);
+  return true;
+}
+let processando = false;
+async function processarFila(){
+  if(processando || !navigator.onLine) return;
+  processando = true;
+  const itens = fila(), resto = [];
+  for(const it of itens){
+    try{ await enviarItem(it); }catch(e){ resto.push(it); }
+  }
+  store.set('mcs_fila', resto);
+  processando = false;
+  renderFila();
+}
+window.addEventListener('online', processarFila);
+
+/* ---------- formulário de envio ---------- */
+let geo = null, fotoData = null, enviado = false;
+
+function prepararEnvio(a){
+  geo = null; fotoData = null; enviado = false;
+  const acs = !!(sessao && perfil);
+  $('consent').checked = acs; $('fields').setAttribute('aria-disabled', acs ? 'false' : 'true');
+  $('fBairro').value = ''; $('fRef').value = ''; $('fFoto').value = '';
+  $('fotoPrev').hidden = true; $('geoInfo').textContent = 'Opcional, ajuda a localizar a casa no mapa.';
+  $('fMicroWrap').hidden = !acs; $('fMicro').value = acs ? (perfil.microarea || '') : '';
+  $('sendStatus').hidden = true; $('btnEnviar').disabled = false; $('btnEnviar').textContent = 'Enviar avaliação';
+  $('sendTitle').textContent = acs ? 'Registrar esta visita' : 'Ajude a mapear as áreas de risco';
+  $('sendSub').textContent = acs ? 'A avaliação vai para o painel da Prefeitura com a sua identificação de agente.'
+    : 'Se quiser, envie esta avaliação para a Defesa Civil e a Prefeitura de Santana de Parnaíba. Nome e documentos não são pedidos.';
+  document.querySelector('.consent').hidden = acs;
+}
+
+$('consent').onchange = e => $('fields').setAttribute('aria-disabled', e.target.checked ? 'false' : 'true');
+
+$('btnGeo').onclick = () => {
+  if(!navigator.geolocation){ $('geoInfo').textContent = 'Este aparelho não informa a localização.'; return; }
+  $('geoInfo').textContent = 'Buscando localização…';
+  navigator.geolocation.getCurrentPosition(p => {
+    geo = {lat:p.coords.latitude, lng:p.coords.longitude, precisao:Math.round(p.coords.accuracy)};
+    $('geoInfo').textContent = 'Localização registrada (precisão de ' + geo.precisao + ' m).';
+  }, () => { $('geoInfo').textContent = 'Não foi possível pegar a localização. Verifique se a permissão está ligada.'; },
+  {enableHighAccuracy:true, timeout:15000, maximumAge:60000});
+};
+
+$('fFoto').onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const img = new Image();
+  img.onload = () => {
+    const max = 1280, k = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width*k); c.height = Math.round(img.height*k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    fotoData = c.toDataURL('image/jpeg', 0.7);
+    $('fotoPrev').src = fotoData; $('fotoPrev').hidden = false;
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+};
+
+function statusEnvio(tipo, texto){
+  const s = $('sendStatus'); s.className = 'status ' + tipo; s.textContent = texto; s.hidden = false;
+}
+
+$('btnEnviar').onclick = async () => {
+  if(enviado || !ultimoResultado) return;
+  const acs = !!(sessao && perfil);
+  if(!acs && !$('consent').checked){ statusEnvio('err', 'Marque a autorização para enviar.'); return; }
+  const id = uuid(), a = ultimoResultado, origem = acs ? 'acs' : 'cidadao';
+  const payload = {
+    client_id:id, avaliado_em:new Date().toISOString(), origem,
+    nivel:a.nivel, pontuacao:Math.min(a.pts,100), respostas:resp, sinais:a.sinais,
+    chuva_recente: resp.chuva === 'sim',
+    lat:geo ? +geo.lat.toFixed(6) : null, lng:geo ? +geo.lng.toFixed(6) : null, precisao_m:geo ? geo.precisao : null,
+    bairro:$('fBairro').value.trim() || null, referencia:$('fRef').value.trim() || null,
+    microarea: acs ? ($('fMicro').value.trim() || null) : null,
+    acs_id: acs ? sessao.user_id : null,
+    foto_path: fotoData ? origem + '/' + id + '.jpg' : null,
+    consentimento:true, versao_app:VERSAO
+  };
+  const item = {payload, foto:fotoData};
+  enviado = true; $('btnEnviar').disabled = true; $('btnEnviar').textContent = 'Enviando…';
+  const urgente = a.nivel >= 2 ? ' Isso não substitui a ligação: em caso de perigo, ligue 199.' : '';
+  try{
+    await enviarItem(item);
+    $('btnEnviar').textContent = 'Avaliação enviada';
+    statusEnvio('ok', 'Avaliação enviada para o mapeamento do município.' + urgente);
+  }catch(e){
+    const q = fila(); q.push(item);
+    if(!store.set('mcs_fila', q)){ item.foto = null; item.payload.foto_path = null; q[q.length-1] = item; store.set('mcs_fila', q); }
+    $('btnEnviar').textContent = 'Guardada para envio';
+    statusEnvio('wait', 'Sem conexão agora. A avaliação foi guardada e será enviada sozinha quando houver internet.' + urgente);
+    renderFila();
+  }
+};
+
+/* ---------- minhas avaliações (ACS) ---------- */
+async function abrirMinhas(){
+  mostrar('minhas');
+  const ul = $('minhasList'); ul.innerHTML = '<li class="empty" style="display:block">Carregando…</li>';
+  const t = await tokenValido();
+  if(!t){ ul.innerHTML = '<li class="empty" style="display:block">Sem conexão ou sessão expirada. Entre de novo quando tiver internet.</li>'; return; }
+  try{
+    const filtro = perfil.papel === 'gestor' ? '' : '&acs_id=eq.' + sessao.user_id;
+    const r = await fetch(SB_URL + '/rest/v1/avaliacoes?select=avaliado_em,nivel,bairro,microarea,status&order=avaliado_em.desc&limit=100' + filtro,
+      {headers:{apikey:SB_KEY, Authorization:'Bearer ' + t}});
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    const st = {nova:'Nova', em_analise:'Em análise', vistoriada:'Vistoriada', arquivada:'Arquivada'};
+    ul.innerHTML = d.length ? d.map(i => '<li><span class="dot" style="background:var(--l' + i.nivel + ')"></span><span><b>' + NIVEIS[i.nivel].nome + '</b> — ' +
+      esc(i.bairro || 'Sem bairro') + (i.microarea ? ' · MA ' + esc(i.microarea) : '') + '<br><small>' +
+      new Date(i.avaliado_em).toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'}) + '</small></span><small>' + st[i.status] + '</small></li>').join('')
+      : '<li class="empty" style="display:block">Nenhuma avaliação registrada ainda.</li>';
+  }catch(e){ ul.innerHTML = '<li class="empty" style="display:block">Não foi possível carregar agora. Tente de novo em instantes.</li>'; }
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+$('btnAcs').onclick = () => { $('loginErr').hidden = true; $('dlgLogin').showModal(); };
+$('btnLogin').onclick = entrar;
+$('lSenha').onkeydown = e => { if(e.key === 'Enter') entrar(); };
+$('btnLoginCancel').onclick = () => $('dlgLogin').close();
+$('btnSairAcs').onclick = sairAcs;
+$('btnMinhas').onclick = abrirMinhas;
+$('btnMinhasVoltar').onclick = () => { renderHistorico(); renderFila(); mostrar('home'); };
+
+renderAcs(); renderFila(); processarFila();
+
+// PWA: só ativa quando hospedado no GitHub Pages (manifest.json e sw.js na mesma pasta)
+if(location.hostname.endsWith('github.io')){
+  const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.json'; document.head.appendChild(l);
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
